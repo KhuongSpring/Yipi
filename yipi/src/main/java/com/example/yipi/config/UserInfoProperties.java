@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
-//@ConfigurationProperties("app.admin")
+@ConfigurationProperties("app.admin")
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
