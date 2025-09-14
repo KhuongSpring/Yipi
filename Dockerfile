@@ -1,12 +1,24 @@
-# Stage 1: Use Maven for building
-FROM maven:3-openjdk-17 AS build
+# Stage 1: Build
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
-COPY . .
+
+# copy pom.xml trước để cache dependency
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# copy source code
+COPY src ./src
+
+# build project
 RUN mvn clean package -DskipTests
 
-# Satge 2: Use OpenJDK for running
-FROM openjdk:17-jdk-slim
+# Stage 2: Run
+FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
-COPY --from=build /app/target/yipi-0.0.1-SNAPSHOT.jar yipi.war
+
+# copy jar từ stage build
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","yipi.war"]
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
